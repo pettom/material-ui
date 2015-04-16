@@ -31,7 +31,7 @@ var NestedMenuItem = React.createClass({
     onItemTap: React.PropTypes.func,
     menuItemStyle: React.PropTypes.object,
   },
-  
+
   getDefaultProps: function() {
     return {
       disabled: false
@@ -103,15 +103,15 @@ var NestedMenuItem = React.createClass({
 
     nestedMenu.style.left = el.offsetWidth + 'px';
   },
-  
+
   _openNestedMenu: function() {
     if (!this.props.disabled) this.setState({ open: true });
   },
-  
+
   _closeNestedMenu: function() {
     this.setState({ open: false });
   },
-  
+
   _toggleNestedMenu: function() {
     if (!this.props.disabled) this.setState({ open: !this.state.open });
   },
@@ -124,7 +124,7 @@ var NestedMenuItem = React.createClass({
     if (this.props.onItemClick) this.props.onItemClick(e, index, menuItem);
     this._closeNestedMenu();
   },
-  
+
   _onMenuItemTap: function(e, index, menuItem) {
     if (this.props.onItemTap) this.props.onItemTap(e, index, menuItem);
     this._closeNestedMenu();
@@ -183,6 +183,8 @@ var Menu = React.createClass({
 
     //Save the initial menu height for later
     this._initialMenuHeight = el.offsetHeight;
+    //Save the initial menu item height for later
+    this._initialMenuItemHeight = el.offsetHeight / Math.max(1, this.props.menuItems.length);
 
     //Show or Hide the menu according to visibility
     this._renderVisibility();
@@ -269,7 +271,7 @@ var Menu = React.createClass({
 
         case MenuItem.Types.LINK:
           itemComponent = (
-            <LinkMenuItem 
+            <LinkMenuItem
               key={i}
               index={i}
               text={menuItem.text}
@@ -283,7 +285,7 @@ var Menu = React.createClass({
 
         case MenuItem.Types.SUBHEADER:
           itemComponent = (
-            <SubheaderMenuItem 
+            <SubheaderMenuItem
               key={i}
               index={i}
               className={this.props.menuItemClassNameSubheader}
@@ -358,17 +360,24 @@ var Menu = React.createClass({
     });
   },
 
+  _getCurrentHeight: function() {
+    var totalItens = Math.max(1, this.props.menuItems.length);
+    var newHeight = this._initialMenuItemHeight * totalItens;
+
+    return newHeight + KeyLine.Desktop.GUTTER_LESS;
+  },
+
   _renderVisibility: function() {
     var el;
 
     if (this.props.hideable) {    
       el = React.findDOMNode(this);
       var container = React.findDOMNode(this.refs.paperContainer);
-      
+
       if (this.props.visible) {
         //Open the menu
         el.style.transition = Transitions.easeOut();
-        el.style.height = this._initialMenuHeight + 'px';
+        el.style.height = this._getCurrentHeight() + 'px';
 
         //Set the overflow to visible after the animation is done so
         //that other nested menus can be shown
